@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kalee MEP — AI Operations Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* ── RESET & BASE ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #0B1C2E;
+    --navy-mid: #162840;
+    --steel: #1E3A52;
+    --accent: #00C28B;
+    --accent-dim: #009E71;
+    --amber: #F5A623;
+    --text: #E8EDF2;
+    --text-muted: #7A93A8;
+    --text-dim: #4A6478;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(255,255,255,0.14);
+    --card: rgba(255,255,255,0.04);
+    --card-hover: rgba(255,255,255,0.07);
+    --radius: 10px;
+    --radius-lg: 16px;
+    --font-head: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+  }
+  html { font-size: 15px; }
+  body {
+    background: var(--navy);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ── LOGIN SCREEN ── */
+  #login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: var(--navy);
+  }
+  .login-box {
+    width: 100%;
+    max-width: 380px;
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 2rem;
+  }
+  .login-logo {
+    font-family: var(--font-head);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+    letter-spacing: -0.02em;
+  }
+  .login-logo span { color: var(--accent); }
+  .login-sub {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .login-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  .login-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 1rem;
+  }
+  .login-input:focus { border-color: var(--accent); }
+  .login-btn {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--accent);
+    color: var(--navy);
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--font-head);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .login-btn:hover { background: var(--accent-dim); }
+  .login-btn:active { transform: scale(0.98); }
+  .login-error {
+    font-size: 0.8rem;
+    color: #FF6B6B;
+    margin-top: 0.75rem;
+    display: none;
+  }
+
+  /* ── APP LAYOUT ── */
+  #app { display: none; min-height: 100vh; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 240px;
+    height: 100vh;
+    background: var(--navy-mid);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    overflow-y: auto;
+  }
+  .sidebar-logo {
+    padding: 1.5rem 1.25rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo-text {
+    font-family: var(--font-head);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .logo-text span { color: var(--accent); }
+  .logo-tagline {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 2px;
+  }
+  .sidebar-section {
+    padding: 1rem 1rem 0.5rem;
+  }
+  .sidebar-section-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-bottom: 2px;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    color: var(--text-muted);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    position: relative;
+  }
+  .nav-item:hover { background: var(--card-hover); color: var(--text); }
+  .nav-item.active {
+    background: rgba(0,194,139,0.1);
+    color: var(--accent);
+  }
+  .nav-icon {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    background: var(--card);
+  }
+  .nav-item.active .nav-icon { background: rgba(0,194,139,0.15); }
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+  .sidebar-footer strong { color: var(--text-muted); }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    margin-left: 240px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    padding: 1.25rem 2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--navy);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .topbar-left h1 {
+    font-family: var(--font-head);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .topbar-left p {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+  .topbar-right {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  .btn-sm {
+    padding: 0.45rem 0.9rem;
+    font-size: 0.78rem;
+    font-weight: 500;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font-body);
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .btn-sm:hover { background: var(--card-hover); color: var(--text); border-color: var(--border-hover); }
+  .btn-accent {
+    background: rgba(0,194,139,0.12);
+    color: var(--accent);
+    border-color: rgba(0,194,139,0.25);
+  }
+  .btn-accent:hover { background: rgba(0,194,139,0.2); color: var(--accent); }
+
+  /* ── CHAT AREA ── */
+  .chat-area {
+    flex: 1;
+    padding: 1.5rem 2rem;
+    max-width: 860px;
+    width: 100%;
+  }
+
+  /* ── QUICK STARTS ── */
+  .quickstart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .quickstart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.9rem 1rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+    width: 100%;
+    font-family: var(--font-body);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+  .quickstart-card:hover {
+    background: var(--card-hover);
+    border-color: var(--border-hover);
+    color: var(--text);
+  }
+  .quickstart-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+
+  /* ── MESSAGES ── */
+  .messages {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .message { display: flex; flex-direction: column; gap: 0.35rem; }
+  .message-role {
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    padding: 0 2px;
+  }
+  .message-role.assistant { color: var(--accent); }
+  .message-bubble {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.1rem;
+    font-size: 0.88rem;
+    line-height: 1.75;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .message-bubble.user {
+    background: rgba(255,255,255,0.03);
+    color: var(--text-muted);
+  }
+
+  /* ── TYPING INDICATOR ── */
+  .typing {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.75rem 1rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+  .typing-dots { display: flex; gap: 4px; }
+  .typing-dots span {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: bounce 1.2s infinite;
+  }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+    40% { transform: translateY(-5px); opacity: 1; }
+  }
+
+  /* ── INPUT AREA ── */
+  .input-area {
+    position: sticky;
+    bottom: 0;
+    background: var(--navy);
+    border-top: 1px solid var(--border);
+    padding: 1rem 2rem;
+    max-width: 860px;
+    width: 100%;
+  }
+  .input-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    transition: border-color 0.2s;
+    overflow: hidden;
+  }
+  .input-wrap:focus-within { border-color: rgba(0,194,139,0.4); }
+  textarea#user-input {
+    width: 100%;
+    padding: 0.9rem 1.1rem 0.5rem;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    resize: none;
+    min-height: 60px;
+    max-height: 200px;
+  }
+  textarea#user-input::placeholder { color: var(--text-dim); }
+  .input-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem 0.75rem;
+  }
+  .input-hint { font-size: 0.72rem; color: var(--text-dim); }
+  .send-btn {
+    padding: 0.5rem 1.1rem;
+    background: var(--accent);
+    color: var(--navy);
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-head);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .send-btn:hover { background: var(--accent-dim); }
+  .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── SAFETY BANNER ── */
+  .safety-banner {
+    margin: 0 2rem 1rem;
+    padding: 0.75rem 1rem;
+    background: rgba(245,166,35,0.06);
+    border: 1px solid rgba(245,166,35,0.2);
+    border-radius: var(--radius);
+    font-size: 0.75rem;
+    color: #c4882a;
+    line-height: 1.5;
+    max-width: 860px;
+  }
+  .safety-banner strong { color: var(--amber); }
+
+  /* ── MOBILE ── */
+  .mobile-toggle {
+    display: none;
+    position: fixed;
+    top: 1rem; left: 1rem;
+    z-index: 200;
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem 0.6rem;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 18px;
+  }
+  @media (max-width: 768px) {
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+    }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; }
+    .mobile-toggle { display: flex; }
+    .chat-area, .input-area { padding: 1rem; }
+    .topbar { padding: 1rem; padding-left: 3.5rem; }
+    .safety-banner { margin: 0 1rem 1rem; }
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--steel); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Kalee<span>.</span></div>
+    <div class="login-sub">MEP & HVAC AI Platform — Oman</div>
+    <label class="login-label" for="pass-input">Access code</label>
+    <input class="login-input" type="password" id="pass-input" placeholder="Enter your access code" autocomplete="off" />
+    <button class="login-btn" onclick="doLogin()">Access platform</button>
+    <div class="login-error" id="login-error">Incorrect access code. Contact your administrator.</div>
+  </div>
+</div>
+
+<!-- ── MAIN APP ── -->
+<button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+
+<div id="app">
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-text">Kalee<span>.</span></div>
+      <div class="logo-tagline">AI Operations Platform</div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Tendering</div>
+      <button class="nav-item" data-assistant="TenderGPT" onclick="switchAssistant('TenderGPT')">
+        <span class="nav-icon">📋</span> TenderGPT
+      </button>
+      <button class="nav-item" data-assistant="EstimatorGPT" onclick="switchAssistant('EstimatorGPT')">
+        <span class="nav-icon">🧮</span> EstimatorGPT
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Engineering</div>
+      <button class="nav-item" data-assistant="HVACGPT" onclick="switchAssistant('HVACGPT')">
+        <span class="nav-icon">❄️</span> HVACGPT
+      </button>
+      <button class="nav-item" data-assistant="PlannerGPT" onclick="switchAssistant('PlannerGPT')">
+        <span class="nav-icon">📅</span> PlannerGPT
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Operations</div>
+      <button class="nav-item" data-assistant="ProcurementGPT" onclick="switchAssistant('ProcurementGPT')">
+        <span class="nav-icon">🚚</span> ProcurementGPT
+      </button>
+      <button class="nav-item" data-assistant="SiteGPT" onclick="switchAssistant('SiteGPT')">
+        <span class="nav-icon">🏗️</span> SiteGPT
+      </button>
+      <button class="nav-item" data-assistant="PMGPT" onclick="switchAssistant('PMGPT')">
+        <span class="nav-icon">📊</span> PMGPT
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Management</div>
+      <button class="nav-item" data-assistant="FinanceGPT" onclick="switchAssistant('FinanceGPT')">
+        <span class="nav-icon">💰</span> FinanceGPT
+      </button>
+      <button class="nav-item" data-assistant="GMGPT" onclick="switchAssistant('GMGPT')">
+        <span class="nav-icon">🎯</span> GMGPT
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <strong>Safety rule</strong><br>
+      AI prepares — humans verify — engineers approve. Never send AI output to a client without review.
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1 id="topbar-title">TenderGPT</h1>
+        <p id="topbar-desc">Tender analysis — from enquiry to bid decision</p>
+      </div>
+      <div class="topbar-right">
+        <button class="btn-sm btn-accent" onclick="copyResponse()">⬡ Copy output</button>
+        <button class="btn-sm" onclick="clearChat()">↺ Clear</button>
+        <button class="btn-sm" onclick="doLogout()">Exit</button>
+      </div>
+    </div>
+
+    <div class="chat-area" id="chat-area">
+      <div id="quickstart-section"></div>
+      <div class="messages" id="messages"></div>
+      <div id="typing-indicator" style="display:none;">
+        <div class="typing">
+          <div class="typing-dots"><span></span><span></span><span></span></div>
+          <span id="typing-label">TenderGPT is preparing your draft...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="safety-banner">
+      <strong>Approval gate:</strong> Every output is a draft. Responsible engineer or manager must review before issuing to any client, authority, or contractor.
+    </div>
+
+    <div class="input-area">
+      <div class="input-wrap">
+        <textarea id="user-input" placeholder="Describe your project, paste scope notes, or ask a question..." rows="3"></textarea>
+        <div class="input-footer">
+          <span class="input-hint">Ctrl+Enter to send</span>
+          <button class="send-btn" id="send-btn" onclick="sendMessage()">
+            Send ↗
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIGURATION ──────────────────────────────────────────────
+// API key is now in Vercel environment variables  // ← REPLACE THIS WITH YOUR KEY
+const ACCESS_PASSWORD = "kalee2026";  // ← CHANGE THIS TO YOUR PASSWORD
+
+// ── ASSISTANT DEFINITIONS ──────────────────────────────────────
+const ASSISTANTS = {
+  TenderGPT: {
+    title: "TenderGPT",
+    desc: "Tender analysis — from enquiry to bid decision",
+    system: `You are TenderGPT for an Oman-based MEP/HVAC contractor. Read tender documents, scope summaries, or descriptions and produce structured bid intelligence. Always produce: 1) Scope summary, 2) Key inclusions, 3) Exclusions to state, 4) Commercial and technical risks, 5) Missing information list, 6) RFI list, 7) Bid/no-bid recommendation with reasoning, 8) Documents needed before pricing. Separate verified facts from assumptions. Never invent quantities or prices. End every output with a section called "HUMAN REVIEW REQUIRED" listing items the engineer or manager must check before this is used.`,
+    prompts: [
+      { label: "Hotel HVAC tender", text: "Review an HVAC tender for a 5-star hotel in Muscat — 150 rooms, central plant. List top 10 risks and give bid/no-bid recommendation." },
+      { label: "Vague scope RFIs", text: "Client sent a vague scope for a restaurant MEP fit-out in Muscat. What RFIs should I raise before pricing?" },
+      { label: "Fast bid check", text: "I have 3 days to submit a tender for a 4000m² office MEP fit-out. What are the most critical things to check before submitting?" },
+    ],
+  },
+  EstimatorGPT: {
+    title: "EstimatorGPT",
+    desc: "BOQ & cost estimation — from scope to supplier RFQs",
+    system: `You are EstimatorGPT for an Oman-based MEP/HVAC contractor. Help structure BOQs, prepare RFQ templates, and analyse cost risks. When given a scope, create: 1) BOQ structure by discipline (HVAC, plumbing, firefighting, electrical, controls) with item description, unit, quantity placeholder marked TBM if not verified, supply rate placeholder, installation rate placeholder, and remarks, 2) Supplier RFQ email drafts for major equipment, 3) Assumptions and exclusions list, 4) Cost risks. Never fabricate quantities — mark them TBM. Focus on Oman market. End with HUMAN REVIEW REQUIRED checklist.`,
+    prompts: [
+      { label: "Office BOQ structure", text: "Create a BOQ structure for a 2000m² office HVAC fit-out in Muscat. VRF system, 40 indoor units, fresh air handling." },
+      { label: "Clinic RFQ emails", text: "Draft RFQ emails for FCUs, AHUs, and a 50TR chiller for a private clinic in Muscat." },
+      { label: "BOQ risk check", text: "What are the most commonly missed items in an MEP BOQ for a hotel project in Oman?" },
+    ],
+  },
+  HVACGPT: {
+    title: "HVACGPT",
+    desc: "HVAC design support — HAP input preparation",
+    system: `You are HVACGPT for an Oman-based MEP/HVAC contractor. Help prepare data for Carrier HAP cooling load calculations. When given room information, produce a room-by-room input checklist table with columns: Room Name, Area m², Ceiling Height m, Occupancy, Lighting W/m², Equipment W, Outdoor Air Requirement, Exposed Wall Orientation, Glass Area m², Glass Type/Shading, Missing Information. List all assumptions. Note Oman outdoor design conditions are approximately 46°C DB / 26°C WB. CRITICAL: Never give final tonnage or equipment sizing — that is the engineer's job after HAP is run. End with HUMAN REVIEW REQUIRED checklist.`,
+    prompts: [
+      { label: "Clinic HAP inputs", text: "Prepare HAP input checklist for a 15-room private clinic in Muscat, ground floor. Mix of consulting rooms, waiting area, and admin." },
+      { label: "Restaurant inputs", text: "Restaurant with 120 covers, commercial kitchen, outdoor terrace, 800m² total in Muscat. What are my HAP inputs and key assumptions?" },
+      { label: "Oman design criteria", text: "What outdoor design conditions, indoor setpoints, and ASHRAE standards should I use for an Oman office building HVAC design?" },
+    ],
+  },
+  PlannerGPT: {
+    title: "PlannerGPT",
+    desc: "Project planning — Primavera & MS Project ready schedules",
+    system: `You are PlannerGPT for an Oman-based MEP/HVAC contractor. Create project schedules. When given scope and duration, produce: 1) Work Breakdown Structure, 2) Activity list table with columns: WBS Code, Activity ID, Activity Name, Duration (working days), Predecessor, Relationship Type, Discipline, Responsible Party, Procurement Required Y/N, Long Lead Flag, Remarks. Include design, approvals, procurement, installation, testing & commissioning, and handover phases. 3) Procurement schedule with equipment lead times. Flag that all durations are estimates requiring planner verification. End with HUMAN REVIEW REQUIRED checklist.`,
+    prompts: [
+      { label: "Hotel MEP schedule", text: "Create MEP schedule for a 50-room hotel fit-out in Muscat. 18-month contract. HVAC, plumbing, firefighting, and electrical." },
+      { label: "Office HVAC schedule", text: "HVAC installation for a 4000m² office, 8-month programme. VRF system. Create WBS and Primavera-ready activity list." },
+      { label: "Oman lead times", text: "What are typical procurement lead times for VRF systems, AHUs, chillers, and cooling towers when ordering for Oman projects?" },
+    ],
+  },
+  ProcurementGPT: {
+    title: "ProcurementGPT",
+    desc: "Procurement — supplier comparison and delivery tracking",
+    system: `You are ProcurementGPT for an Oman-based MEP/HVAC contractor. Help manage procurement. Produce: 1) RFQ packages with technical specs, 2) Supplier comparison tables with: Supplier, Brand/Model, Country of Origin, Technical Compliance, Unit Price, Total Price, Lead Time weeks, Delivery Terms, Warranty, Payment Terms, Exclusions, Risk Notes, Recommendation. 3) Long-lead item tracker, 4) Material submittal tracker. Flag anything needing engineer approval. Common Oman/GCC HVAC brands: Carrier, Daikin, Trane, Mitsubishi, LG, York, Hitachi. End with HUMAN REVIEW REQUIRED checklist.`,
+    prompts: [
+      { label: "Chiller RFQ package", text: "Create an RFQ package for a 200TR air-cooled chiller for a commercial building in Muscat. Include technical requirements." },
+      { label: "Compare 3 VRF quotes", text: "I have 3 VRF quotes: Daikin VRV at OMR 45,000 (16 weeks), Mitsubishi City Multi at OMR 48,000 (12 weeks), Carrier at OMR 42,000 (20 weeks). Compare and recommend." },
+      { label: "Long-lead tracker", text: "What equipment should I flag as long-lead immediately at the start of a large MEP project in Oman?" },
+    ],
+  },
+  SiteGPT: {
+    title: "SiteGPT",
+    desc: "Site reporting — notes and photos to professional reports",
+    system: `You are SiteGPT for an Oman-based MEP/HVAC contractor. Convert site updates and notes into professional daily and weekly reports. Daily Report includes: Date, Project, Weather, Manpower by trade (ductman/plumber/electrician/helper/supervisor/total), Work Completed (area/system/activity/quantity if stated), Materials Received, Inspections, Safety (toolbox talk/incidents/unsafe acts/permits), Delays (cause/responsible party/impact on programme), Tomorrow Plan, Actions Required. Weekly Report includes: Executive Summary, Planned vs Actual Progress, Critical Delays, Procurement Status, Commercial Status, Safety & Quality, Client Decisions Needed, Risk Register. Never claim completion percentages unless stated. End with HUMAN REVIEW REQUIRED checklist.`,
+    prompts: [
+      { label: "Convert foreman notes", text: "Convert these site notes: 8 ductmen on level 3 ductwork, 2 plumbers on drainage. Drawing issue delayed FCU installation. 1 near miss reported near scaffold. Materials for tomorrow not yet delivered." },
+      { label: "Weekly progress report", text: "Create a weekly client progress report for a hotel MEP project: 65% complete overall, HVAC ahead, plumbing on track, firefighting 2 weeks behind due to material delay." },
+      { label: "Delay report", text: "Client-caused delay: engineer drawing not approved for 3 weeks, affecting ductwork installation on floors 4-6. Help me document this properly." },
+    ],
+  },
+  PMGPT: {
+    title: "PMGPT",
+    desc: "Project manager cockpit — health, risks and recovery",
+    system: `You are PMGPT for an Oman-based MEP/HVAC contractor. Summarise project health and help PMs manage risks. Produce: 1) Executive Summary with RAG status (Red/Amber/Green), 2) Planned vs Actual Progress, 3) Critical Delays (cause/responsible/programme impact in days), 4) Top 5 Risks (risk/probability/impact/mitigation), 5) Procurement Risks, 6) Cost Risks (variations submitted/pending/margin risk), 7) Client Decisions Needed (decision/due date/impact if delayed), 8) Recovery Plan (actions/owner/deadline), 9) Actions for Next Week. Be direct. Do not hide bad news. Flag if formal delay notice or variation notice is needed. End with HUMAN REVIEW REQUIRED checklist.`,
+    prompts: [
+      { label: "Distressed project", text: "Project is 3 weeks behind programme, client hasn't approved structural drawings, materials stuck in customs, and we have a milestone payment due next week. Give me a recovery plan." },
+      { label: "Weekly PM summary", text: "Summarise health for hotel HVAC project: Week 24 of 36, 62% complete vs 68% planned, chiller delivery delayed 4 weeks, 2 variations pending approval at OMR 45,000." },
+      { label: "Variation strategy", text: "Client instructed additional works verbally 3 weeks ago. We've done the work but no written instruction. How do I protect my commercial position?" },
+    ],
+  },
+  FinanceGPT: {
+    title: "FinanceGPT",
+    desc: "Cost control — cash flow, margins and receivables",
+    system: `You are FinanceGPT for an Oman-based MEP/HVAC contractor. Track project finances and cash flow. Produce: 1) Project Financial Summary: Contract Value, Variations, Revised Contract Value, Invoiced, Certified, Received, Outstanding Receivables, Retention Held. 2) Cost Summary: Committed Cost, Actual Cost to Date, Forecast Final Cost, Forecast Profit/Loss, Margin %. 3) Cash Flow Forecast next 3 months. 4) Red Flags: unpaid invoices over 60 days, margin erosion, uncommitted variations, cash deficit months. 5) Recommended Actions. Focus on Oman construction payment practices (IPC-based, 10% retention, VAT). Flag when commercial manager or legal review is needed. End with HUMAN REVIEW REQUIRED checklist.`,
+    prompts: [
+      { label: "Financial health check", text: "Contract: OMR 850,000. Variations approved: OMR 45,000. Invoiced: OMR 400,000. Received: OMR 260,000. Committed cost: OMR 680,000. Actual cost to date: OMR 320,000. Analyse this and flag risks." },
+      { label: "Cash flow forecast", text: "Create a 6-month cash flow forecast for a OMR 1.2M MEP project. Monthly billing of OMR 120,000, 60-day payment terms, 10% retention." },
+      { label: "Overdue payments", text: "Client hasn't paid last 3 IPCs totalling OMR 180,000. What formal steps should I take and what notices should I issue?" },
+    ],
+  },
+  GMGPT: {
+    title: "GMGPT",
+    desc: "GM dashboard — one-page owner view across all projects",
+    system: `You are GMGPT for an Oman-based MEP/HVAC contractor. Produce a one-page executive dashboard for the General Manager or owner. When given data across projects, produce: 1) Company Overview: Total Active Projects, Total Contract Value, Total Invoiced, Total Received, Outstanding Receivables. 2) Project RAG Status table: Project Name, Contract Value, % Complete, Schedule (R/A/G), Cash (R/A/G), Procurement (R/A/G), Client (R/A/G), Margin Risk (R/A/G). 3) Decisions Required Today (decision/project/impact/deadline). 4) Top 3 Company Risks. 5) Owner Action List (concrete, specific, with deadlines). Be ruthlessly direct. Red = immediate action, Amber = monitor closely, Green = on track. End with HUMAN REVIEW REQUIRED checklist.`,
+    prompts: [
+      { label: "3-project overview", text: "3 active projects: Hotel HVAC OMR 900K (3 weeks behind, client slow on drawings), Office fit-out OMR 450K (on track, good cash), Clinic MEP OMR 280K (payment dispute OMR 85K outstanding). Give me my GM dashboard." },
+      { label: "Monday morning review", text: "It's Monday morning. I'm the owner. Tell me what decisions I need to make today across my MEP business and what I should personally chase." },
+      { label: "Company risk summary", text: "What are the top risks an Oman MEP contractor should track at company level, not just project level?" },
+    ],
+  },
+};
+
+// ── STATE ──────────────────────────────────────────────────────
+let currentAssistant = "TenderGPT";
+let histories = {};
+let isLoading = false;
+
+// ── AUTH ───────────────────────────────────────────────────────
+function doLogin() {
+  const val = document.getElementById("pass-input").value.trim();
+  if (val === ACCESS_PASSWORD) {
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("app").style.display = "flex";
+    switchAssistant("TenderGPT");
+  } else {
+    document.getElementById("login-error").style.display = "block";
+    document.getElementById("pass-input").value = "";
+  }
+}
+
+function doLogout() {
+  document.getElementById("app").style.display = "none";
+  document.getElementById("login-screen").style.display = "flex";
+  document.getElementById("pass-input").value = "";
+}
+
+document.getElementById("pass-input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") doLogin();
+});
+
+// ── SIDEBAR ────────────────────────────────────────────────────
+function toggleSidebar() {
+  document.getElementById("sidebar").classList.toggle("open");
+}
+
+// ── SWITCH ASSISTANT ───────────────────────────────────────────
+function switchAssistant(name) {
+  currentAssistant = name;
+  const a = ASSISTANTS[name];
+
+  document.querySelectorAll(".nav-item").forEach(el => {
+    el.classList.toggle("active", el.dataset.assistant === name);
+  });
+
+  document.getElementById("topbar-title").textContent = a.title;
+  document.getElementById("topbar-desc").textContent = a.desc;
+  document.getElementById("typing-label").textContent = `${name} is preparing your draft...`;
+  document.getElementById("user-input").placeholder =
+    `Ask ${name} anything — paste scope notes, project data, site updates...`;
+
+  renderMessages();
+  renderQuickstarts();
+
+  document.getElementById("sidebar").classList.remove("open");
+}
+
+// ── RENDER QUICKSTARTS ─────────────────────────────────────────
+function renderQuickstarts() {
+  const section = document.getElementById("quickstart-section");
+  const history = histories[currentAssistant] || [];
+
+  if (history.length > 0) {
+    section.innerHTML = "";
+    return;
+  }
+
+  const a = ASSISTANTS[currentAssistant];
+  section.innerHTML = `
+    <div class="quickstart-grid">
+      ${a.prompts.map(p => `
+        <button class="quickstart-card" onclick="sendQuick(${JSON.stringify(p.text)})">
+          <div class="quickstart-label">${p.label}</div>
+          ${p.text}
+        </button>
+      `).join("")}
+    </div>
+  `;
+}
+
+// ── RENDER MESSAGES ────────────────────────────────────────────
+function renderMessages() {
+  const container = document.getElementById("messages");
+  const history = histories[currentAssistant] || [];
+
+  container.innerHTML = history.map(msg => `
+    <div class="message">
+      <div class="message-role ${msg.role}">${msg.role === "user" ? "You" : currentAssistant}</div>
+      <div class="message-bubble ${msg.role}">${escHtml(msg.content)}</div>
+    </div>
+  `).join("");
+
+  scrollToBottom();
+}
+
+function escHtml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function scrollToBottom() {
+  const area = document.getElementById("chat-area");
+  area.scrollTop = area.scrollHeight;
+}
+
+// ── SEND ───────────────────────────────────────────────────────
+async function sendMessage() {
+  const input = document.getElementById("user-input");
+  const text = input.value.trim();
+  if (!text || isLoading) return;
+  input.value = "";
+  await runAssistant(text);
+}
+
+async function sendQuick(text) {
+  if (isLoading) return;
+  await runAssistant(text);
+}
+
+async function runAssistant(userMessage) {
+  isLoading = true;
+  document.getElementById("send-btn").disabled = true;
+
+  if (!histories[currentAssistant]) histories[currentAssistant] = [];
+  histories[currentAssistant].push({ role: "user", content: userMessage });
+
+  document.getElementById("quickstart-section").innerHTML = "";
+  renderMessages();
+
+  document.getElementById("typing-indicator").style.display = "block";
+  scrollToBottom();
+
+  try {
+    const a = ASSISTANTS[currentAssistant];
+    const messages = histories[currentAssistant].map(m => ({
+      role: m.role, content: m.content
+    }));
+
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1500,
+        system: a.system,
+        messages,
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `API error ${res.status}`);
+    }
+
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || "No response received.";
+
+    histories[currentAssistant].push({ role: "assistant", content: reply });
+
+  } catch (err) {
+    histories[currentAssistant].push({
+      role: "assistant",
+      content: `Error: ${err.message}\n\nCheck that your API key is correct and has available credits.`
+    });
+  } finally {
+    document.getElementById("typing-indicator").style.display = "none";
+    isLoading = false;
+    document.getElementById("send-btn").disabled = false;
+    renderMessages();
+    updateNavDots();
+  }
+}
+
+// ── NAV DOTS ───────────────────────────────────────────────────
+function updateNavDots() {
+  document.querySelectorAll(".nav-item").forEach(el => {
+    const name = el.dataset.assistant;
+    const existing = el.querySelector(".nav-dot");
+    if (histories[name] && histories[name].length > 0 && name !== currentAssistant) {
+      if (!existing) {
+        const dot = document.createElement("span");
+        dot.className = "nav-dot";
+        el.appendChild(dot);
+      }
+    } else if (existing) {
+      existing.remove();
+    }
+  });
+}
+
+// ── ACTIONS ────────────────────────────────────────────────────
+function clearChat() {
+  histories[currentAssistant] = [];
+  renderMessages();
+  renderQuickstarts();
+  updateNavDots();
+}
+
+function copyResponse() {
+  const history = histories[currentAssistant] || [];
+  const lastAssistant = [...history].reverse().find(m => m.role === "assistant");
+  if (lastAssistant) {
+    navigator.clipboard.writeText(lastAssistant.content)
+      .then(() => {
+        const btn = document.querySelector(".btn-accent");
+        const orig = btn.textContent;
+        btn.textContent = "✓ Copied";
+        setTimeout(() => btn.textContent = orig, 1500);
+      });
+  }
+}
+
+// ── KEYBOARD SHORTCUT ──────────────────────────────────────────
+document.getElementById("user-input").addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+</script>
+</body>
+</html>
